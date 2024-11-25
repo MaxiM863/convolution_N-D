@@ -9,4 +9,4 @@ Autocorrection algorithm for transmission by Maxim Thibodeau
 
 ## Publication de l'auteur
 
-[Publication:Maxim Thibodeau](https://github.com/MaxiM863/convolution_N-D/PDF/cryptographieAutoCorrige_THIM14067706.pdf)
+Read more [Publication:Maxim Thibodeau](./PDF/cryptographieAutoCorrige_THIM14067706.pdf)
