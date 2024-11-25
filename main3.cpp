@@ -47,7 +47,7 @@ bool creerClef(int argc, char** argv) {
 
     char* filenameClef = getCmdOption(argv, argv + argc, "-cc");
 
-    cout << endl << "Création d'une clef dans le fichier: " << filenameClef << " !";
+    cout << endl << "Crï¿½ation d'une clef dans le fichier: " << filenameClef << " !";
 
     cout << endl << "Entrer le nombres de dimensions (1-6, inclusivement): ";
 
@@ -57,7 +57,7 @@ bool creerClef(int argc, char** argv) {
 
         cin >> nbrHash;
 
-        if (nbrHash < 1 || nbrHash > 6) cout << endl << "Le nombre de dimensions doit être entre 1-6, inclusivement ! Entrer: ";
+        if (nbrHash < 1 || nbrHash > 6) cout << endl << "Le nombre de dimensions doit ï¿½tre entre 1-6, inclusivement ! Entrer: ";
     }
 
     cout << endl << "Merci ! Le nombre de dimensions et de hashs est de: " << nbrHash << " !" << endl << endl;
@@ -74,17 +74,17 @@ bool creerClef(int argc, char** argv) {
 
             cin >> largeur;
 
-            if (largeur < 1 || largeur > 10) cout << endl << "La largeur de la dimension doit être entre 1-10, inclusivement ! Entrer: ";
+            if (largeur < 1 || largeur > 10) cout << endl << "La largeur de la dimension doit ï¿½tre entre 1-10, inclusivement ! Entrer: ";
         }
 
         dimensions.push_back(largeur);
     }
 
-    cout << endl << endl << "Vos valeures seront permuttés différament pour chacun des hashs !";
+    cout << endl << endl << "Vos valeures seront permuttï¿½s diffï¿½rament pour chacun des hashs !";
 
     vector<vector<int>> hashs = permuterDimensions(dimensions);
 
-    cout << endl << endl << "Entrer une valeure d'encryption maximale (1=non-encrypté - 255=encrypté(diminue le nombre de dimensions maximale)) suggestion(1): ";
+    cout << endl << endl << "Entrer une valeure d'encryption maximale (1=non-encryptï¿½ - 255=encryptï¿½(diminue le nombre de dimensions maximale)) suggestion(1): ";
 
     int encryption = 0;
 
@@ -92,7 +92,7 @@ bool creerClef(int argc, char** argv) {
 
         cin >> encryption;
 
-        if (encryption < 1 || encryption > 255) cout << endl << "Le nombre d'encryptions doit être entre 1-255, inclusivement ! Entrer: ";
+        if (encryption < 1 || encryption > 255) cout << endl << "Le nombre d'encryptions doit ï¿½tre entre 1-255, inclusivement ! Entrer: ";
     }
 
     correcteur C;
@@ -124,9 +124,9 @@ bool creerClef(int argc, char** argv) {
 
         ecrire(data, filenameClef, cntr);
 
-        cout << endl << "Clef créée avec succès !";
+        cout << endl << "Clef crï¿½ï¿½e avec succï¿½s !";
     }
-    else cout << endl << "Clef impossible à créer !";
+    else cout << endl << "Clef impossible ï¿½ crï¿½er !";
 
     cout << endl;
 
@@ -139,10 +139,10 @@ bool afficherOptions() {
     cout << endl << "\t" << "-c: Appliquer une convolution N-D !";
     cout << endl << "\t" << "-d: De-appliquer une convolution N-D !";
     cout << endl << "\t" << "-clef: Utiliser ce fichier pour la clef !";
-    cout << endl << "\t" << "-e: Fichier d'entré !";
+    cout << endl << "\t" << "-e: Fichier d'entrï¿½ !";
     cout << endl << "\t" << "-s: Fichier de sortie !";
     cout << endl << "\t" << "-bench: Ne pas tenir compte des autres args et executer le bench-test !";
-    cout << endl << "\t" << "-cc: Ne pas tenir compte des autres args et créer une clef dans ce fichier !";
+    cout << endl << "\t" << "-cc: Ne pas tenir compte des autres args et crï¿½er une clef dans ce fichier !";
     cout << endl << "\t" << "-h: Afficher l'aide !";
     cout << endl;
 
@@ -207,6 +207,8 @@ bool insererErreurs(uint64_t* data, int pourcentageBitsErreurs, int dataLength) 
             }
         }
     }
+    
+    return true;
 }
 
 bool bench() {
@@ -250,8 +252,8 @@ bool bench() {
         //insererErreurs(dataC)
     }
 
-    //if (success) cout << endl << "Bench-test executé avec succès !";
-    //else cout << endl << "Bench-test a échoué !";
+    //if (success) cout << endl << "Bench-test executï¿½ avec succï¿½s !";
+    //else cout << endl << "Bench-test a ï¿½chouï¿½ !";
 
     cout << endl;
 
