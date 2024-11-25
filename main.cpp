@@ -211,7 +211,7 @@ bool insererErreurs(uint64_t* data, int pourcentageBitsErreurs, int dataLength) 
 
 bool bench() {
 
-    cout << endl << "Execution du bench-test !";
+    cout << endl << "bench-test pas fonctionel!";
 
     cout << endl;
 
