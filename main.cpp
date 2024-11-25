@@ -8,8 +8,6 @@
 #include"correcteur.h"
 #include"eccConvolutionalHash.h"
 
-//#pragma warning(disable : 4996)
-
 using namespace std;
 
 uint32_t* getRandomData(int size);
