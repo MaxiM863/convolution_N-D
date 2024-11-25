@@ -6,3 +6,7 @@ Autocorrection algorithm for transmission by Maxim Thibodeau
 ## Convolution
 
 ![Convolution 3-D](Images/Convolution_3D.png "Convolution 3-D: sarosijbose")
+
+## Publication de l'auteur
+
+[Publication:Maxim Thibodeau](https://github.com/MaxiM863/convolution_N-D/PDF/cryptographieAutoCorrige_THIM14067706.pdf)
