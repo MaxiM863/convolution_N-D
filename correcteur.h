@@ -1,9 +1,6 @@
-#pragma once
-
 #include<string>
 #include<math.h>
 #include<random>
-#include<iostream>
 
 class correcteur {
 
@@ -255,7 +252,7 @@ private:
     static void corriger(std::vector<std::vector<int>> dimensions, uint64_t* inputData, unsigned char* key, 
         int cntr, int dataLength, std::vector<int> keyPos, std::vector<int>& erreurs, int* data, int hashNbr) {
 
-        // trouver l'opposé géométrique:
+        // trouver l'opposï¿½ gï¿½omï¿½trique:
         // effectuer les translation pour sortir l'erreur
 
         int nbrHash = dimensions.size();
