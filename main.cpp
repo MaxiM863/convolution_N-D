@@ -122,9 +122,9 @@ bool creerClef(int argc, char** argv) {
 
         ecrire(data, filenameClef, cntr);
 
-        cout << endl << "Clef cr��e avec succ�s !";
+        cout << endl << "Clef creee avec succes !";
     }
-    else cout << endl << "Clef impossible � cr�er !";
+    else cout << endl << "Clef impossible a creer !";
 
     cout << endl;
 
@@ -137,10 +137,10 @@ bool afficherOptions() {
     cout << endl << "\t" << "-c: Appliquer une convolution N-D !";
     cout << endl << "\t" << "-d: De-appliquer une convolution N-D !";
     cout << endl << "\t" << "-clef: Utiliser ce fichier pour la clef !";
-    cout << endl << "\t" << "-e: Fichier d'entr� !";
+    cout << endl << "\t" << "-e: Fichier d'entre !";
     cout << endl << "\t" << "-s: Fichier de sortie !";
     cout << endl << "\t" << "-bench: Ne pas tenir compte des autres args et executer le bench-test !";
-    cout << endl << "\t" << "-cc: Ne pas tenir compte des autres args et cr�er une clef dans ce fichier !";
+    cout << endl << "\t" << "-cc: Ne pas tenir compte des autres args et creer une clef dans ce fichier !";
     cout << endl << "\t" << "-h: Afficher l'aide !";
     cout << endl;
 
