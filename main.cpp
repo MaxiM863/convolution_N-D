@@ -133,7 +133,7 @@ bool creerClef(int argc, char** argv) {
 
 bool afficherOptions() {
 
-    cout << endl << "Options:";
+    cout << endl << "Options: (projet en construction !)";
     cout << endl << "\t" << "-c: Appliquer une convolution N-D !";
     cout << endl << "\t" << "-d: De-appliquer une convolution N-D !";
     cout << endl << "\t" << "-clef: Utiliser ce fichier pour la clef !";
