@@ -38,7 +38,106 @@ int main(int argc, char** argv) {
         return creerClef(argc, argv);
     }
 
+    if (cmdOptionExists(argv, argv + argc, "-c"))
+    {
+        if (cmdOptionExists(argv, argv + argc, "-s"))
+        {
+            if (cmdOptionExists(argv, argv + argc, "-e"))
+            {
+                if (cmdOptionExists(argv, argv + argc, "-clef"))
+                {
+                    char* convolution;
+
+                    char* clef;
+                    size_t* lengthClef;
+
+                    lire(getCmdOption(argv, argv + argc, "-clef"), clef, lengthClef);
+
+                    unsigned char* clefF = new unsigned char[*lengthClef + 1];
+
+                    for(int i = 0; i < *lengthClef; i++)
+                    {
+                        clefF[i] = (unsigned char)clef[i];
+                    }
+
+                    clefF[*lengthClef] = '\0';
+
+                    char* data;
+                    size_t* dataLength;
+
+                    lire(getCmdOption(argv, argv + argc, "-e"), data, dataLength);
+
+                    uint32_t* dataB = new uint32_t[*dataLength];
+                    convolution = new char[*dataLength];
+
+                    for(int i = 0; i < *dataLength; i++)
+                    {
+                        dataB[i] = (uint32_t)data[i];
+                    }
+
+                    int splitSize = getSplitSize(clefF);
+
+                    correcteur C;
+
+                    uint64_t* totalChunk = new uint64_t[*dataLength];
+
+                    for(int i = 0; i < *dataLength/splitSize; i++)
+                    {
+                        uint32_t* chunkD = new uint32_t[splitSize];
+                        memccpy(chunkD, dataB, i * splitSize, splitSize);
+
+                        uint64_t* chunk = C.encrypting(chunkD, clefF, splitSize);
+
+                        memcpy(&totalChunk[i*splitSize], chunk, splitSize);
+                    }
+
+                    ofstream outputFile(getCmdOption(argv, argv + argc, "-s"), std::ios::binary);
+
+                    if (!outputFile) {
+                        std::cerr << "Error opening file for writing." << std::endl;
+                        return 1;
+                    }
+
+                    for (int i = 0; i < *dataLength; i++) {
+
+                        outputFile.write(reinterpret_cast<const char*>(&totalChunk[i]), sizeof(uint64_t));
+                    }
+
+                    outputFile.close();
+                }
+                else
+                {
+                    cout << endl << "Vous devez specifier une clef !";
+                }
+            }
+            else
+            {
+                cout << endl << "Vous devez specifier un fichier d'entree !";
+            }
+        }
+        else 
+        {
+            cout << endl << "Vous devez specifier un fichier de sortie !";
+        }
+
+        return 1;
+    }
+
     return 0;
+}
+
+int getSplitSize(unsigned char* clef)
+{
+    int nbrHash = clef[0];
+
+    int nbrSommeDim = 1;
+
+    for(int i = 0; i < nbrHash; i++)
+    {
+        nbrSommeDim *= clef[i+1];
+    }
+
+    return pow(nbrSommeDim, nbrHash);
 }
 
 bool creerClef(int argc, char** argv) {
@@ -257,6 +356,30 @@ bool bench() {
     cout << endl;*/
 
     return 0;
+}
+
+bool lire(char* filename, char* data, size_t* length) {
+
+    ifstream file(filename, std::ios::binary);
+
+    if (!file) 
+    {
+        std::cerr << "Unable to open file";
+        return 1;
+    }
+    
+    file.seekg(0, std::ios::end);
+    *length = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    data = new char[*length];
+
+    if (!file.read(data, *length)) 
+    {
+        std::cerr << "Error reading file";
+    }
+
+    file.close();
 }
 
 bool ecrire(char* data, char* filename, size_t length) {
