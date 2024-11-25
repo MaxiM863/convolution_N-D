@@ -215,6 +215,7 @@ bool bench() {
 
     cout << endl;
 
+    /*
     vector<int> dims;
 
     dims.push_back(2);
@@ -253,7 +254,7 @@ bool bench() {
     //if (success) cout << endl << "Bench-test execut� avec succ�s !";
     //else cout << endl << "Bench-test a �chou� !";
 
-    cout << endl;
+    cout << endl;*/
 
     return 0;
 }
