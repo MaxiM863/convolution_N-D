@@ -1,2 +1,2 @@
 Crypto:
-	g++ -o3 main3.cpp -o convolution_N-D
+	g++ -o3 main.cpp -o convolution_N-D
