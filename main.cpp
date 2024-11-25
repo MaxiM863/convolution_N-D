@@ -1,506 +1,340 @@
-/*#include<iostream>
+#include<iostream>
 #include<fstream>
 #include<filesystem>
 #include<random>
+#include<string.h>
+#include<algorithm>
 
 #include"correcteur.h"
-#include <string.h>
-#include "eccConvolutionalHash.h"
+#include"eccConvolutionalHash.h"
 
-#pragma warning(disable : 4996)
+//#pragma warning(disable : 4996)
 
 using namespace std;
 
 uint32_t* getRandomData(int size);
+char* getCmdOption(char** begin, char** end, const std::string& option);
+bool cmdOptionExists(char** begin, char** end, const std::string& option);
 
-int main3(int argc, char** argv) {
+bool bench();
+vector<vector<int>> permuterDimensions(vector<int> dims);
+bool ecrire(char* data, char* filename, size_t length);
+bool afficherOptions();
+bool creerClef(int argc, char** argv);
+bool insererErreurs(uint64_t* data, int pourcentageBitsErreurs);
 
-    //std::cout << argv[1] << std::endl;
+int main(int argc, char** argv) {
 
-    if (strcmp(argv[1], "encrypt") == 0) {
-
-        std::ifstream file(argv[2], std::ios::binary);
-
-        if (!file) {
-            std::cerr << "Unable to open file";
-            return 1;
-        }
-        // Determine the file size
-        file.seekg(0, std::ios::end);
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
-
-        // Allocate memory for the file content
-        unsigned char* fff = new unsigned char[size];
-
-        // Read the file content into the buffer
-        if (file.read(reinterpret_cast<char*>(fff), size)) {
-            // Successfully read the file
-            for (std::streamsize i = 0; i < size; ++i) {
-                std::cout << static_cast<int>(fff[i]) << " ";
-            }
-        }
-        else {
-            std::cerr << "Error reading file";
-        }
-
-        // Clean up
-
-        file.close();
-
-
-        std::ifstream file2(argv[3], std::ios::binary);
-
-        if (!file2) {
-            std::cerr << "Unable to open file";
-            return 1;
-        }
-        // Determine the file size
-        file2.seekg(0, std::ios::end);
-        std::streamsize size2 = file2.tellg();
-        file2.seekg(0, std::ios::beg);
-
-        // Allocate memory for the file content
-        unsigned char* clef = new unsigned char[size2];
-
-        // Read the file content into the buffer
-        if (file2.read(reinterpret_cast<char*>(clef), size2)) {
-            // Successfully read the file
-            for (std::streamsize i = 0; i < size2; ++i) {
-
-                std::cout << static_cast<int>(clef[i]) << "-";
-            }
-        }
-        else {
-            std::cerr << "Error reading file";
-        }
-
-        // Clean up
-
-        file2.close();
-
-
-        correcteur E;
-
-        uint64_t* rep = nullptr;// = E.encrypting(fff, clef, size);
-
-
-        std::ofstream outputFile(argv[2], std::ios::binary);
-        if (!outputFile) {
-            std::cerr << "Error opening file for writing." << std::endl;
-            return 1;
-        }
-
-        for (int i = 0; i < size; i++) {
-
-            outputFile.write(reinterpret_cast<const char*>(&rep[i]), sizeof(rep[i]));
-            std::cout << rep[i] << " -- ";
-        }
-
-        outputFile.close();
-
-        delete[] fff;
-        delete[] rep;
-        delete[] clef;
+    if (cmdOptionExists(argv, argv + argc, "-h"))
+    {
+        return afficherOptions();
     }
-    else if (strcmp(argv[1], "key") == 0) {
 
-        correcteur E;
-
-        std::vector<int> tmpKeyA = { 3, 1, 2, 1 };
-
-        std::vector<std::vector<int>> keyDim;
-
-        keyDim.push_back(tmpKeyA);
-
-        tmpKeyA = { 3, 1, 1, 2 };
-
-        keyDim.push_back(tmpKeyA);
-
-        int keySize = 0;
-
-        unsigned char* key = E.getKey(keyDim, 4, keySize);
-
-        std::ofstream outputFile("clef.txt", std::ios::binary);
-        if (!outputFile) {
-            std::cerr << "Error opening file for writing." << std::endl;
-            return 1;
-        }
-
-        for (int i = 0; i < keySize; i++) {
-
-            outputFile.write(reinterpret_cast<const char*>(&key[i]), sizeof(key[i]));
-        }
-
-        outputFile.close();
+    if (cmdOptionExists(argv, argv + argc, "-bench"))
+    {
+        return bench();
     }
-    else if (strcmp(argv[1], "decrypt") == 0) {
 
-        std::filesystem::path filePath2 = argv[2];
-
-        uint64_t ll = std::filesystem::file_size(filePath2);
-
-        uint64_t* ff = new uint64_t[ll / 8];
-
-
-        std::ifstream file(argv[2], std::ios::binary);
-
-        if (!file) {
-            std::cerr << "Unable to open file";
-            return 1;
-        }
-        // Determine the file size
-        file.seekg(0, std::ios::end);
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
-
-        // Allocate memory for the file content
-        //unsigned char* fff = new unsigned char[size];
-
-        for (int i = 0; i < ll / 8; i++) {
-
-            file.read(reinterpret_cast<char*>(&ff[i]), sizeof(ff[0]));
-            //std::cout << "***" << ff[i];
-        }
-        // Clean up
-
-        file.close();
-
-
-        std::filesystem::path filePath = argv[3];
-
-        uint64_t llll = std::filesystem::file_size(filePath);
-
-        //unsigned char* clef = new unsigned char[llll];
-
-
-        std::ifstream file2(argv[3], std::ios::binary);
-
-        if (!file2) {
-            std::cerr << "Unable to open file";
-            return 1;
-        }
-        // Determine the file size
-        file2.seekg(0, std::ios::end);
-        size = file2.tellg();
-        file2.seekg(0, std::ios::beg);
-
-        // Allocate memory for the file content
-        unsigned char* clef = new unsigned char[size];
-
-        // Read the file content into the buffer
-        if (file2.read(reinterpret_cast<char*>(clef), size)) {
-            // Successfully read the file
-            for (std::streamsize i = 0; i < size; ++i) {
-                std::cout << static_cast<int>(clef[i]) << " ";
-            }
-        }
-        else {
-            std::cerr << "Error reading file";
-        }
-
-        // Clean up
-
-        file2.close();
-
-
-        correcteur E;
-
-        //std::cout << (ff[0] << 48 >> 56) << " ? ? ? ";
-
-        std::vector<int> tmptmp;
-
-        int* final = E.decrypting(ff, ll / 8, clef, tmptmp);
-
-        for (int i = 0; i < ll / 8; i++) std::cout << (int)final[i] << ":";
-
-        FILE* MyFileSS = fopen(argv[2], "wb");
-
-        fwrite(&final[0], sizeof(unsigned char), ll / 8, MyFileSS);
-
-        fclose(MyFileSS);
+    if (cmdOptionExists(argv, argv + argc, "-cc"))
+    {
+        return creerClef(argc, argv);
     }
-    else if (strcmp(argv[1], "bench") == 0) {
 
-        for (int i = 4; i <= 4; i += 1) {
-
-            int lengthData = pow(2, i);
-
-            srand(time(0));
-
-            uint32_t* data = getRandomData(lengthData);
-
-            for (int oo = 4; oo <= 4; oo++) {
-
-                for (int ttt = 2; ttt <= 2; ttt += 2) {
-
-                    for (int ooo = oo; ooo <= oo; ooo++) {
-
-                        std::vector<std::vector<int>> kkey;
-
-                        for (int jj = 0; jj < oo; jj++) {
-
-                            std::vector<int> tmpyyyy;
-                            kkey.push_back(tmpyyyy);
-
-                            for (int k = 0; k < ooo; k++) {
-
-                                if (k == jj) kkey[jj].push_back(2);
-                                else kkey[jj].push_back(1);
-                            }
-                        }
-
-                        std::vector<double> tmpData;
-
-                        correcteur E;
-                        eccConvolutionalHash C;
-
-                        int keySize = 1;
-
-                        unsigned char* key = E.getKey(kkey, 4, keySize);
-
-                        auto start = std::chrono::high_resolution_clock::now();
-
-                        uint64_t* rep = E.encrypting(data, key, lengthData);
-
-                        char* dataH = new char[lengthData + 1];
-
-                        for (int hi = 0; hi < lengthData; hi++) {
-
-                            char tmpIII = data[hi] + 1;
-
-                            dataH[hi] = tmpIII;
-                        }
-
-                        dataH[lengthData] = '\0';
-
-                        int* repHash = C.encode(dataH, lengthData);
-
-                        //for (int y = 0; y < lengthData; y++) std::cout << rep[y] << " ";
-
-                        auto end = std::chrono::high_resolution_clock::now();
-
-                        std::chrono::duration<double> duration = end - start;
-
-                        tmpData.push_back(duration.count());
-
-                        std::ofstream outputFile("c:/a/results.txt", std::ios::binary);
-                        if (!outputFile) {
-                            std::cerr << "Error opening file for writing." << std::endl;
-                            return 1;
-                        }
-
-
-                        for (int y = 9; y > 5; y -= 1) {
-
-                            int failNbr = 0;
-                            int failNbrH = 0;
-                            int nbrErreursCreated = 0;
-                            double totalTime = 0.0;
-
-                            for (int uuy = 0; uuy < 10000; uuy++) {
-
-                                bool test = true;
-                                bool testH = true;
-                                int ratio = y;
-
-                                uint64_t* repp = new uint64_t[lengthData];
-                                int* reppH = new int[(lengthData + 8)*13];
-
-                                int nbrErreurs = 0;
-                                int nbrErreursH = 0;
-
-                                for (int j = 0; j < lengthData; j++) {
-
-                                    repp[j] = rep[j];
-
-                                    //std::cout << rep[j] << ":";
-
-                                    test = true;
-
-                                    int localErrors = 0;
-
-                                    for (int u = 0; u < 64; u++) {
-
-                                        if (rand() % (ratio) == 0)
-                                        {
-                                            test = false;
-                                            nbrErreurs++;
-                                            localErrors++;
-                                        }
-                                    }
-
-                                    for (int uui = 0; uui < localErrors; uui++) {
-
-                                        int pos2 = rand() % 2;
-
-                                        int pos = rand() % 32;
-
-                                        uint32_t tmpL = 0L;
-
-                                        tmpL = UINT32_MAX;
-
-                                        tmpL >>= 31;
-                                        tmpL <<= 31;
-                                        tmpL >>= (32 - pos);
-
-                                        if (pos2 == 0) {
-
-                                            uint32_t tmpLL = (uint32_t)((repp[j] << 32) >> 32);
-
-                                            if ((tmpLL << pos) >> 31 == 0) {
-
-                                                tmpLL |= tmpL;
-                                            }
-                                            else {
-
-                                                tmpLL &= (tmpL ^ UINT32_MAX);
-                                            }
-
-                                            repp[j] >>= 32;
-                                            repp[j] <<= 32;
-
-                                            repp[j] |= tmpLL;
-
-                                            uint64_t vv = repp[j];
-                                        }
-                                        else {
-
-                                            uint32_t tmpLL = (uint32_t)(repp[j] >> 32);
-
-                                            if ((tmpLL << pos) >> 31 == 0) {
-
-                                                tmpLL |= tmpL;
-                                            }
-                                            else {
-
-                                                tmpLL &= (tmpL ^ UINT32_MAX);
-                                            }
-
-                                            repp[j] <<= 32;
-                                            repp[j] >>= 32;
-
-                                            uint64_t tmpKJH = tmpLL;
-
-                                            repp[j] |= (tmpKJH << 32);
-
-                                            uint64_t vv = repp[j];
-                                        }
-
-                                        uint64_t uv = rep[j];
-                                        uint64_t vv = repp[j];
-
-                                        int hhhh = 0;
-                                    }
-                                }
-                                /////////////////////////////
-                                /////////////////////////////
-                                for (int j = 0; j < (lengthData + 8) * 13; j++) {
-
-                                    reppH[j] = repHash[j];
-
-                                    //std::cout << repHash[j] << ":";
-
-                                    testH = true;
-
-                                    int localErrorsH = 0;
-
-                                    for (int u = 0; u < 8; u++) {
-
-                                        if (rand() % ratio == 0)
-                                        {
-                                            testH = false;
-                                            nbrErreursH++;
-                                            localErrorsH++;
-                                        }
-                                    }
-
-                                    for (int uui = 0; uui < localErrorsH; uui++) {
-
-                                        int pos = rand() % 8;
-
-                                        char tmpL = 255;
-
-                                        tmpL >>= 7;
-                                        tmpL <<= 7;
-                                        tmpL >>= (8 - pos);
-
-                                        char tmpLL = reppH[j];
-
-                                        if ((tmpLL << pos) >> 7 == 0) {
-
-                                            tmpLL |= tmpL;
-                                        }
-                                        else {
-
-                                            tmpLL &= (tmpL ^ INT8_MAX);
-                                        }
-
-                                        reppH[j] = tmpLL;
-                                    }
-                                }
-
-                                std::vector<int> listeErreurs;
-
-                                auto start2 = std::chrono::high_resolution_clock::now();
-
-                                int* finaleData = E.decrypting(repp, lengthData, key, listeErreurs);
-                                //int* finaleDataH = C.decode(reppH, lengthData);
-
-                                auto end2 = std::chrono::high_resolution_clock::now();
-
-                                std::chrono::duration<double> duration2 = end2 - start2;
-
-                                totalTime += duration2.count();
-
-                                bool test3 = false;
-                                bool test4 = false;
-
-                                for (int p = 0; p < lengthData; p++) {
-
-                                    //std::cout << finaleData[p];
-
-                                    if (finaleData[p] != data[p]) {
-
-                                        test3 = true;
-                                        break;
-                                    }
-
-                                    //int a = finaleDataH[p];
-                                    int b = dataH[p];
-
-                                    /*if (finaleDataH[p] != dataH[p]) {
-
-                                        test4 = true;
-                                        break;
-                                    }*/
-                                /*}
-
-                                if (test3 && listeErreurs.size() == 0) std::cout << "f ";
-
-                                if (test3) {
-
-                                    failNbr++;
-                                }
-
-                                if (test4) failNbrH++;
-
-                                nbrErreursCreated += nbrErreurs;
-                            }
-
-                            std::cout << "Lengthdata: " << lengthData << "  NumberofHash: " << oo << "  Ratiooffailure: " << y << " NumberOfFailure:" << failNbr << " / 10000_failtests(corrective)!" << " time:" << totalTime/10000 << std::endl;
-
-                            outputFile << "Lengthdata: " << lengthData << "  NumberofHash: " << oo << "  Ratiooffailure: " << y << " NumberOfFailure:" << failNbr << " / 10000_failtests(corrective)!" << " time:" << totalTime/10000 << std::endl;
-                        }
-
-                        outputFile.close();
-                    }
-                }
-            }
-        }
-    }
+    return 0;
 }
 
+bool creerClef(int argc, char** argv) {
+
+    char* filenameClef = getCmdOption(argv, argv + argc, "-cc");
+
+    cout << endl << "Cr�ation d'une clef dans le fichier: " << filenameClef << " !";
+
+    cout << endl << "Entrer le nombres de dimensions (1-6, inclusivement): ";
+
+    int nbrHash = 0;
+
+    while (nbrHash < 1 || nbrHash > 6) {
+
+        cin >> nbrHash;
+
+        if (nbrHash < 1 || nbrHash > 6) cout << endl << "Le nombre de dimensions doit �tre entre 1-6, inclusivement ! Entrer: ";
+    }
+
+    cout << endl << "Merci ! Le nombre de dimensions et de hashs est de: " << nbrHash << " !" << endl << endl;
+
+    vector<int> dimensions;
+
+    for (int i = 0; i < nbrHash; i++) {
+
+        cout << "Entrer la largeur de la dimension #" << i + 1 << " (1-10, inclusivement): ";
+
+        int largeur = 0;
+
+        while (largeur < 1 || largeur > 10) {
+
+            cin >> largeur;
+
+            if (largeur < 1 || largeur > 10) cout << endl << "La largeur de la dimension doit �tre entre 1-10, inclusivement ! Entrer: ";
+        }
+
+        dimensions.push_back(largeur);
+    }
+
+    cout << endl << endl << "Vos valeures seront permutt�s diff�rament pour chacun des hashs !";
+
+    vector<vector<int>> hashs = permuterDimensions(dimensions);
+
+    cout << endl << endl << "Entrer une valeure d'encryption maximale (1=non-encrypt� - 255=encrypt�(diminue le nombre de dimensions maximale)) suggestion(1): ";
+
+    int encryption = 0;
+
+    while (encryption < 1 || encryption > 255) {
+
+        cin >> encryption;
+
+        if (encryption < 1 || encryption > 255) cout << endl << "Le nombre d'encryptions doit �tre entre 1-255, inclusivement ! Entrer: ";
+    }
+
+    correcteur C;
+
+    unsigned char* clef = C.getKey(hashs, encryption);
+
+    bool success = clef != nullptr;
+
+    if (success) {
+
+        char* data;
+        char tmpC = clef[0];
+        int cntr = 0;
+
+        while (tmpC != '\0') {
+
+            cntr++;
+            tmpC = clef[cntr];
+        }
+
+        data = new char[cntr + 1];
+
+        for (int i = 0; i < cntr; i++) {
+
+            data[i] = clef[i];
+        }
+
+        data[cntr + 1] = '\0';
+
+        ecrire(data, filenameClef, cntr);
+
+        cout << endl << "Clef cr��e avec succ�s !";
+    }
+    else cout << endl << "Clef impossible � cr�er !";
+
+    cout << endl;
+
+    return 0;
+}
+
+bool afficherOptions() {
+
+    cout << endl << "Options:";
+    cout << endl << "\t" << "-c: Appliquer une convolution N-D !";
+    cout << endl << "\t" << "-d: De-appliquer une convolution N-D !";
+    cout << endl << "\t" << "-clef: Utiliser ce fichier pour la clef !";
+    cout << endl << "\t" << "-e: Fichier d'entr� !";
+    cout << endl << "\t" << "-s: Fichier de sortie !";
+    cout << endl << "\t" << "-bench: Ne pas tenir compte des autres args et executer le bench-test !";
+    cout << endl << "\t" << "-cc: Ne pas tenir compte des autres args et cr�er une clef dans ce fichier !";
+    cout << endl << "\t" << "-h: Afficher l'aide !";
+    cout << endl;
+
+    return 0;
+}
+
+bool insererErreurs(uint64_t* data, int pourcentageBitsErreurs, int dataLength) {
+
+    for(int posData; posData < dataLength; posData++) {
+
+        for (int pos64 = 0; pos64 < 64; pos64++) {
+
+            int pos2 = pos64 % 2;
+
+            int pos = pos64 % 32;
+
+            uint32_t tmpL = 0L;
+
+            tmpL = UINT32_MAX;
+
+            tmpL >>= 31;
+            tmpL <<= 31;
+            tmpL >>= (32 - pos);
+
+            if (pos2 == 0) {
+
+                uint32_t tmpLL = (uint32_t)((data[posData] << 32) >> 32);
+
+                if ((tmpLL << pos) >> 31 == 0) {
+
+                    tmpLL |= tmpL;
+                }
+                else {
+
+                    tmpLL &= (tmpL ^ UINT32_MAX);
+                }
+
+                data[posData] >>= 32;
+                data[posData] <<= 32;
+
+                data[posData] |= tmpLL;
+            }
+            else {
+
+                uint32_t tmpLL = (uint32_t)(data[posData] >> 32);
+
+                if ((tmpLL << pos) >> 31 == 0) {
+
+                    tmpLL |= tmpL;
+                }
+                else {
+
+                    tmpLL &= (tmpL ^ UINT32_MAX);
+                }
+
+                data[posData] <<= 32;
+                data[posData] >>= 32;
+
+                uint64_t tmpKJH = tmpLL;
+
+                data[posData] |= (tmpKJH << 32);
+            }
+        }
+    }
+    
+    return true;
+}
+
+bool bench() {
+
+    cout << endl << "Execution du bench-test !";
+
+    cout << endl;
+
+    vector<int> dims;
+
+    dims.push_back(2);
+    dims.push_back(1);
+    dims.push_back(1);
+    dims.push_back(1);
+
+    vector<vector<int>> hashs = permuterDimensions(dims);
+
+    int dataSize = 1000000;
+
+    uint32_t* data = getRandomData(dataSize);
+
+    correcteur C;
+
+    unsigned char* clef = C.getKey(hashs, 1);
+
+    for (int i = 0; i < 100; i++) {
+
+        auto start2 = std::chrono::high_resolution_clock::now();
+
+        for (int j = 0; j < dataSize / 16; j++) {
+
+            uint32_t* chunkData = new uint32_t[16];
+
+            //int* finaleData = C.encrypting(chunckData, clef, 16);
+        }
+
+        auto end2 = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double> duration2 = end2 - start2;
+
+        //insererErreurs(dataC)
+    }
+
+    //if (success) cout << endl << "Bench-test execut� avec succ�s !";
+    //else cout << endl << "Bench-test a �chou� !";
+
+    cout << endl;
+
+    return 0;
+}
+
+bool ecrire(char* data, char* filename, size_t length) {
+
+    ofstream file(filename, std::ios::binary);
+
+    if (!file) {
+        std::cerr << "Unable to open file";
+        return false;
+    }
+
+    file.write(data, length);
+
+    file.close();
+
+    return true;
+}
+
+vector<vector<int>> permuterDimensions(vector<int> dims) {
+
+    vector<vector<int>> dimensions;
+
+    int hauteDim = 0;
+
+    for (int i = 0; i < dims.size(); i++) {
+
+        if (dims[i] > hauteDim) hauteDim = dims[i];
+    }
+
+    for (int i = 0; i < dims.size(); i++) {
+
+        vector<int> tmp;
+        dimensions.push_back(tmp);
+    }
+
+    for (int i = 0; i < dims.size(); i++) {
+
+        vector<int> tmpV = dims;
+
+        for (int j = 0; j < tmpV.size(); j++) {
+
+            if (tmpV[j] == hauteDim) {
+
+                tmpV.erase(tmpV.begin() + j);
+                j--;
+            }
+        }
+
+        for (int j = 0; j < dims.size(); j++) {
+
+            if (i == j) dimensions[i].push_back(hauteDim);
+            else {
+
+                int pos = rand() % tmpV.size();
+                dimensions[i].push_back(tmpV[pos]);
+                tmpV.erase(tmpV.begin() + pos);
+            }
+        }
+    }
+
+    return dimensions;
+}
+
+char* getCmdOption(char** begin, char** end, const string& option)
+{
+    char** itr = find(begin, end, option);
+    if (itr != end && ++itr != end)
+    {
+        return *itr;
+    }
+    return 0;
+}
+
+bool cmdOptionExists(char** begin, char** end, const string& option)
+{
+    return find(begin, end, option) != end;
+}
 
 uint32_t* getRandomData(int size) {
 
@@ -508,10 +342,8 @@ uint32_t* getRandomData(int size) {
 
     for (int i = 0; i < size; i++) {
 
-        data[i] = i%256;
-
-        //std::cout << data[i];
+        data[i] = i % 256;
     }
 
     return data;
-}*/
+}
